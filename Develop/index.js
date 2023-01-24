@@ -1,27 +1,23 @@
-// TODO: Include packages needed for this application
+//Included packages
 const fs = require('fs');
 const inquirer = require('inquirer');
-const util = require("util");
+const markdown = require('./utils/generateMarkdown');
 
-const writeFileAsync = util.promisify(fs.writeFile);
 
-const licences = ["MIT", "Apache 2.0", "BSD3", "None"];
+const licenses = ["MIT", "Apache 2.0", "BSD3", "None"];
 
-// TODO: Create an array of questions for user input
-//"project title", Description, Table of Contents, Installation, Usage, License, Contributing, Tests, and Questions
-/*
-    {
-        type: "input",
-        message: "",
-        name: ""
-    },
-*/
+//Array of questions 
 const questions = [
 
     {
         type: "input",
         message: "What is your Github Username?",
         name: "username"
+    },
+    {
+        type: "input",
+        message: "What is the name of your repo?",
+        name: "reponame"
     },
     {
         type: "input",
@@ -36,8 +32,9 @@ const questions = [
     {
         type: "list",
         message: "What kind of license are you using?",
+        name: "licenses",
         choices: licenses,
-        default: licenses[1],
+        default: licenses[1]
     },
     
     {
@@ -49,7 +46,7 @@ const questions = [
     {
         type: "input",
         message: "What command do you use to run tests? (leave blank if none)",
-        name: "test"
+        name: "tests"
     },
     {
         type: "input",
@@ -64,7 +61,7 @@ const questions = [
     {
         type: "input",
         message: "What does the user need to know to contribute to this project?",
-        name: "adding"
+        name: "contributions"
     },
     {
         type: "input",
@@ -73,29 +70,31 @@ const questions = [
     },
 ];
 
-function licenseBadge (licenseChoices) {
-    let badge = "";
-    switch (licenseChoices) {
-        case "MIT":
-            badge = "[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)";
-            break;
-        case "APACHE 2.0":
-            badge = "[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)]";
-            break;
-        case "BSD3":
-            badge = "[![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)";
-            break;
-        default:
-            badge = "";
-    }
-    return badge;
+
+//prompts the user  
+function promptUser() {
+    return inquirer.prompt(questions);
 }
 
-// TODO: Create a function to write README file
-function writeToFile(fileName, data) {}
 
-// TODO: Create a function to initialize app
-function init() {}
+//function initializes application and catches errors
+function init() {
+    promptUser()
+        .then((response) => {
+            
+           
+            data = markdown.generateMarkdown(response);
+            fs.writeFile('./Generated/README.md', data, (err) =>
+                err ? console.error(err) : console.log('Success!')
+            );
+
+
+            
+            
+        }).then(() => {
+            console.log("README generation was successful.");
+            }).catch(error => console.log(error));
+}
 
 // Function call to initialize app
 init();
